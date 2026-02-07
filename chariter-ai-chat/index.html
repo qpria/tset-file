@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>캐릭터 기반 AI 대화실</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="style.css" rel="stylesheet" />
+</head>
+<body>
+  <!-- SECTION: App Shell -->
+  <div class="app">
+    <header class="app-header">
+      <div class="branding">
+        <div class="logo-orb"></div>
+        <div class="brand-text">
+          <h1>Persona Link</h1>
+          <p>캐릭터 기반 AI 롤플레잉 챗</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="pill-button" id="toggleViewBtn" data-view="characters">캐릭터 관리</button>
+        <button class="pill-button pill-primary" id="startChatBtn">채팅으로 이동</button>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <!-- SECTION: Character Manager Screen -->
+      <section class="screen screen--active" id="characterScreen">
+        <div class="screen-header">
+          <h2>캐릭터 관리</h2>
+          <p>관계, 말투, 스토리를 설정해서 나만의 페르소나를 만들어요.</p>
+        </div>
+
+        <div class="screen-grid">
+          <!-- Character List -->
+          <aside class="panel panel-list">
+            <div class="panel-heading">
+              <h3>캐릭터 목록</h3>
+              <button class="icon-button" id="newCharacterBtn" title="새 캐릭터">
+                <span>＋</span>
+              </button>
+            </div>
+            <ul class="character-list" id="characterList">
+              <!-- JS-populated -->
+            </ul>
+          </aside>
+
+          <!-- Character Editor -->
+          <section class="panel panel-editor">
+            <div class="panel-heading">
+              <h3 id="editorTitle">캐릭터 생성</h3>
+            </div>
+
+            <form id="characterForm" class="character-form">
+              <!-- SECTION: Basic Info -->
+              <div class="form-row">
+                <div class="field">
+                  <label for="charName">이름</label>
+                  <input type="text" id="charName" placeholder="예: 아린, 레온, 사라" required />
+                </div>
+                <div class="field">
+                  <label for="charRole">캐릭터 포지션</label>
+                  <input type="text" id="charRole" placeholder="예: 동급생, 선배, 파트너 AI" />
+                </div>
+              </div>
+
+              <!-- SECTION: Relationship & Story -->
+              <div class="form-row">
+                <div class="field">
+                  <label for="charRelationship">유저와의 관계</label>
+                  <input type="text" id="charRelationship" placeholder="예: 어릴 때부터 알고 지낸 소꿉친구" />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="field field--full">
+                  <label for="charBackstory">공통 스토리 & 설정</label>
+                  <textarea id="charBackstory" rows="3" placeholder="둘 사이의 과거, 약속, 갈등, 일상을 자유롭게 적어주세요."></textarea>
+                </div>
+              </div>
+
+              <!-- SECTION: Tone & Mode -->
+              <div class="form-row">
+                <div class="field">
+                  <label for="charTone">기본 말투 스타일</label>
+                  <select id="charTone">
+                    <option value="soft">기본 · 부드러운</option>
+                    <option value="spicy">맵게 · 직설적인</option>
+                    <option value="cold">차갑고 시니컬</option>
+                    <option value="tsun">좋아하면서 퉁명스러운 (츤데레)</option>
+                    <option value="yandere">집착이 느껴지는 애정 (안전 수위)</option>
+                    <option value="contempt">살짝 비꼬는 경멸 섞인</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label for="charToneIntensity">톤 강도</label>
+                  <input type="range" id="charToneIntensity" min="1" max="5" value="3" />
+                  <div class="range-labels">
+                    <span>잔잔</span>
+                    <span>강렬</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row form-row--toggles">
+                <div class="toggle-group">
+                  <label class="toggle">
+                    <input type="checkbox" id="affectionEnabled" checked />
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">호감도 시스템 사용</span>
+                  </label>
+                  <label class="toggle">
+                    <input type="checkbox" id="trustEnabled" />
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">신뢰도 시스템 사용</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- SECTION: Extra Guidance -->
+              <div class="form-row">
+                <div class="field field--full">
+                  <label for="charGuidelines">말투 & 행동 가이드 (선택)</label>
+                  <textarea id="charGuidelines" rows="3" placeholder="구체적인 말버릇, 자주 하는 행동, 금지하고 싶은 말 등을 적어주세요."></textarea>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="primary-button" id="saveCharacterBtn">캐릭터 저장</button>
+                <button type="button" class="ghost-button" id="resetFormBtn">새로 작성</button>
+                <button type="button" class="danger-button" id="deleteCharacterBtn" disabled>삭제</button>
+              </div>
+            </form>
+          </section>
+        </div>
+      </section>
+
+      <!-- SECTION: Chat Screen -->
+      <section class="screen" id="chatScreen">
+        <div class="screen-header">
+          <h2 id="chatTitle">채팅</h2>
+          <p id="chatSubtitle">왼쪽에서 캐릭터를 선택한 뒤 대화를 시작해 보세요.</p>
+        </div>
+
+        <div class="screen-grid screen-grid--chat">
+          <!-- Left: Chat & Image -->
+          <section class="panel panel-chat">
+            <div class="chat-top">
+              <div class="chat-character-meta" id="chatCharacterMeta">
+                <div class="avatar-orb" id="chatAvatarOrb"></div>
+                <div>
+                  <div class="chat-name" id="chatCharName">캐릭터 미선택</div>
+                  <div class="chat-relationship" id="chatRelationship">관계 정보가 여기 표시됩니다.</div>
+                </div>
+              </div>
+
+              <div class="mood-chip" id="moodChip">대기 중</div>
+            </div>
+
+            <!-- Dynamic Visual / Image Area -->
+            <div class="chat-visual" id="chatVisual">
+              <div class="visual-layer visual-layer--base"></div>
+              <div class="visual-layer visual-layer--mood"></div>
+              <div class="visual-caption" id="visualCaption">대화 분위기에 따라 비주얼이 변합니다.</div>
+            </div>
+
+            <!-- Chat Log -->
+            <div class="chat-log" id="chatLog">
+              <!-- Messages will appear here -->
+            </div>
+
+            <!-- Action Composer -->
+            <div class="action-editor" id="actionEditor">
+              <label for="autoActionText">AI가 제안한 스토리 / 행동 라인</label>
+              <textarea id="autoActionText" rows="2" placeholder="AI가 만든 장면 설명, 행동, 내레이션이 여기에 나타나며, 직접 수정할 수 있어요."></textarea>
+              <div class="action-editor-actions">
+                <button class="ghost-button" id="regenActionBtn">다른 라인 제안</button>
+                <button class="primary-button" id="applyActionBtn">이 라인으로 진행</button>
+              </div>
+            </div>
+
+            <!-- Input Bar -->
+            <form class="chat-input" id="chatForm">
+              <div class="chat-input-main">
+                <input type="text" id="chatMessage" placeholder="메시지 또는 /행동 명령을 입력해 보세요. 예: /쓰담쓰담, /무시하기" autocomplete="off" />
+              </div>
+              <button type="submit" class="primary-button">전송</button>
+            </form>
+          </section>
+
+          <!-- Right: Live Controls & Stats -->
+          <aside class="panel panel-side">
+            <div class="panel-heading">
+              <h3>실시간 모드 & 수치</h3>
+            </div>
+
+            <!-- Live Mode Controls -->
+            <section class="side-section">
+              <h4>대화 중 톤 변경</h4>
+              <div class="field">
+                <label for="liveTone">말투 스타일</label>
+                <select id="liveTone">
+                  <option value="inherit">캐릭터 기본값 사용</option>
+                  <option value="soft">기본 · 부드러운</option>
+                  <option value="spicy">맵게 · 직설적인</option>
+                  <option value="cold">차갑고 시니컬</option>
+                  <option value="tsun">좋아하면서 퉁명스러운 (츤데레)</option>
+                  <option value="yandere">집착이 느껴지는 애정 (안전 수위)</option>
+                  <option value="contempt">살짝 비꼬는 경멸 섞인</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="liveToneIntensity">톤 강도</label>
+                <input type="range" id="liveToneIntensity" min="1" max="5" value="3" />
+                <div class="range-labels">
+                  <span>잔잔</span>
+                  <span>강렬</span>
+                </div>
+              </div>
+
+              <div class="toggle-group toggle-group--column">
+                <label class="toggle">
+                  <input type="checkbox" id="liveAffectionToggle" />
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-label">호감도 추적</span>
+                </label>
+                <label class="toggle">
+                  <input type="checkbox" id="liveTrustToggle" />
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-label">신뢰도 추적</span>
+                </label>
+              </div>
+            </section>
+
+            <!-- Affection / Trust Stats -->
+            <section class="side-section">
+              <h4>관계 수치</h4>
+              <div class="stat-block">
+                <div class="stat-header">
+                  <span>호감도</span>
+                  <span id="affectionValue">0</span>
+                </div>
+                <div class="stat-bar">
+                  <div class="stat-bar-fill" id="affectionBar"></div>
+                </div>
+                <p class="stat-caption" id="affectionText">아직 서로를 알아가는 단계예요.</p>
+              </div>
+
+              <div class="stat-block">
+                <div class="stat-header">
+                  <span>신뢰도</span>
+                  <span id="trustValue">0</span>
+                </div>
+                <div class="stat-bar stat-bar--trust">
+                  <div class="stat-bar-fill" id="trustBar"></div>
+                </div>
+                <p class="stat-caption" id="trustText">대화를 통해 신뢰가 쌓이거나 깎일 수 있어요.</p>
+              </div>
+            </section>
+
+            <!-- System Log -->
+            <section class="side-section">
+              <h4>시스템 피드백</h4>
+              <ul class="system-log" id="systemLog"></ul>
+            </section>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>⚠️ 이 데모는 클라이언트 사이드 시뮬레이션으로, 실제 AI 서버 연결 없이 동작합니다.</span>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
