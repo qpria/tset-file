@@ -84,6 +84,62 @@ body {
   box-shadow: var(--shadow-soft);
 }
 
+/* SECTION: VEIL 3D City Field */
+.veil-hero {
+  position: relative;
+  height: 320px;
+  border-radius: 24px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  border: 1px solid rgba(112, 122, 255, 0.28);
+  background: #04050d;
+  box-shadow: var(--shadow-subtle);
+}
+
+.veil-hero canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.veil-hero-fog {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom,
+      rgba(4, 5, 13, 0) 0%,
+      rgba(4, 5, 13, 0.05) 45%,
+      rgba(4, 5, 13, 0.55) 82%,
+      rgba(4, 5, 13, 0.92) 100%);
+}
+
+.veil-hero-label {
+  position: absolute;
+  left: 22px;
+  bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.veil-hero-title {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  color: #f7f7ff;
+  text-shadow: 0 0 22px rgba(107, 123, 255, 0.85), 0 0 60px rgba(107, 123, 255, 0.45);
+}
+
+.veil-hero-sub {
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.18em;
+  color: var(--color-text-muted);
+}
+
 .app-header {
   display: flex;
   align-items: center;
@@ -853,6 +909,10 @@ input[type="range"] {
     border-radius: 0;
   }
 
+  .veil-hero {
+    height: 240px;
+  }
+
   .app-header {
     flex-direction: column;
     align-items: flex-start;
@@ -878,6 +938,16 @@ input[type="range"] {
 }
 
 @media (max-width: 640px) {
+  .veil-hero {
+    height: 190px;
+    border-radius: 18px;
+  }
+
+  .veil-hero-title {
+    font-size: 24px;
+    letter-spacing: 0.3em;
+  }
+
   .branding {
     gap: 10px;
   }
